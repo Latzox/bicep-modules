@@ -83,7 +83,7 @@ jobs:
           module_path=$(dirname $file | sed 's|^\./||')
           module_name=$(basename $file .bicep)
           version="${{ steps.vars.outputs.short_sha }}"
-          registry="br:myRegistry.azurecr.io/bicep/modules/$module_path/$module_name:$version"
+          registry="br:latzo.azurecr.io/bicep/modules/$module_path/$module_name:$version"
           echo "Publishing $file to $registry"
           az bicep publish --file $file --target $registry
         done
