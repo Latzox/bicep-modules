@@ -1,4 +1,7 @@
-name: Bicep CI/CD Pipeline
+name: Bicep Modules Build and Publish
+
+run-name: >
+  ${{ github.workflow }}: ${{ github.event_name }} for ${{ github.ref_name }} by @${{ github.actor }}
 
 on:
   push:
@@ -36,15 +39,15 @@ jobs:
     - name: Validate and Test Bicep modules
       run: |
         for file in $(find . -name '*.bicep'); do
-          param_file="${file%}.bicepparam"
+          param_file="${file%.bicep}.bicepparam"
           echo "Validating $file"
           az bicep build --file $file
           if [ -f "$param_file" ]; then
             echo "Testing $file with parameters $param_file"
-            az deployment group validate --resource-group myResourceGroup --template-file $file --parameters @$param_file
+            az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $file --parameters $param_file
           else
             echo "Testing $file without parameters"
-            az deployment group validate --resource-group myResourceGroup --template-file $file
+            az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $file
           fi
         done
 
