@@ -80,7 +80,7 @@ jobs:
       run: |
         for file in $(find . -name '*.bicep'); do
           module_name=$(basename $file .bicep)
-          registry="br:myRegistry.azurecr.io/$module_name:1.0.0"
+          registry="br:latzo.azurecr.io/$module_name:1.0.0"
           echo "Publishing $file to $registry"
           az bicep publish --file $file --target $registry
         done
