@@ -23,7 +23,7 @@ jobs:
     
     - name: Set up Azure CLI
       uses: azure/cli@v2
-      with:
+      with: 
         azcliversion: latest
         inlineScript: |
           az account show
@@ -36,10 +36,16 @@ jobs:
     - name: Validate and Test Bicep modules
       run: |
         for file in $(find . -name '*.bicep'); do
+          param_file="${file%}.bicepparam"
           echo "Validating $file"
           az bicep build --file $file
-          echo "Testing $file"
-          az deployment group validate --resource-group myResourceGroup --template-file $file
+          if [ -f "$param_file" ]; then
+            echo "Testing $file with parameters $param_file"
+            az deployment group validate --resource-group myResourceGroup --template-file $file --parameters @$param_file
+          else
+            echo "Testing $file without parameters"
+            az deployment group validate --resource-group myResourceGroup --template-file $file
+          fi
         done
 
   publish:
@@ -59,6 +65,8 @@ jobs:
       uses: azure/cli@v2
       with:
         azcliversion: latest
+        inlineScript: |
+          az account show
         
     - name: Install Bicep CLI
       run: |
