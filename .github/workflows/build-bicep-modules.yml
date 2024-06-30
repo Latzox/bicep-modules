@@ -1,0 +1,54 @@
+name: Build Bicep Modules
+
+run-name: >
+  ${{ github.workflow }}: ${{ github.event_name }} for ${{ github.ref_name }} by @${{ github.actor }}
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: Set up Azure CLI
+      uses: azure/cli@v2
+      with: 
+        azcliversion: latest
+        inlineScript: |
+          az account show
+        
+    - name: Install Bicep CLI
+      run: |
+        az bicep install
+        az bicep version
+
+    - name: Validate and Test Bicep modules
+      run: |
+        for file in $(find . -name '*.bicep'); do
+          param_file="${file%.bicep}.bicepparam"
+          echo "Validating $file"
+          az bicep build --file $file
+          if [ -f "$param_file" ]; then
+            echo "Testing $file with parameters $param_file"
+            az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $file --parameters $param_file
+          else
+            echo "Testing $file without parameters"
+            az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $file
+          fi
+        done
