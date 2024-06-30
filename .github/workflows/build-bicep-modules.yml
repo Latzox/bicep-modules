@@ -36,15 +36,17 @@ jobs:
 
     - name: Validate and Test Bicep modules
       run: |
-        for file in $(find . -name '*.bicep'); do
-          param_file="${file%.bicep}.bicepparam"
-          echo "Validating $file"
-          az bicep build --file $file
-          if [ -f "$param_file" ]; then
-            echo "Testing $file with parameters $param_file"
-            az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $file --parameters $param_file
-          else
-            echo "Testing $file without parameters"
-            az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $file
+        for dir in $(find . -type d); do
+          if [ -f "$dir/main.bicep" ]; then
+            param_file="$dir/params.bicepparam"
+            echo "Validating $dir/main.bicep"
+            az bicep build --file $dir/main.bicep
+            if [ -f "$param_file" ]; then
+             echo "Testing $dir/main.bicep with parameters $param_file"
+              az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $dir/main.bicep --parameters $param_file
+            else
+              echo "Testing $dir/main.bicep without parameters"
+              az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $dir/main.bicep
+            fi
           fi
         done
