@@ -90,4 +90,5 @@ jobs:
             # Publish new latest
             echo "Publishing $dir/main.bicep to $registry:$short_sha"
             az bicep publish --file $dir/main.bicep --target $registry:$short_sha
+          fi
         done
