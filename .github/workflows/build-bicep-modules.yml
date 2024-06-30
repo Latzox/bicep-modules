@@ -9,10 +9,6 @@ on:
       - '**'
       - '!main'
 
-  pull_request:
-    branches:
-      - main
-
 jobs:
   Build:
     runs-on: ubuntu-latest
