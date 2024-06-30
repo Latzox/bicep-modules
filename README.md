@@ -1,4 +1,4 @@
-[![Bicep Modules Build and Publish](https://github.com/Latzox/bicep-modules/actions/workflows/publish-bicep-modules.yml/badge.svg)](https://github.com/Latzox/bicep-modules/actions/workflows/publish-bicep-modules.yml)
+[![Build Bicep Modules](https://github.com/Latzox/bicep-modules/actions/workflows/build-bicep-modules.yml/badge.svg)](https://github.com/Latzox/bicep-modules/actions/workflows/build-bicep-modules.yml) [![Bicep Modules Build and Publish](https://github.com/Latzox/bicep-modules/actions/workflows/publish-bicep-modules.yml/badge.svg)](https://github.com/Latzox/bicep-modules/actions/workflows/publish-bicep-modules.yml)
 
 # Public Bicep Modules
 
