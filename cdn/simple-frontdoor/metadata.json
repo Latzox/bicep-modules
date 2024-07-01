@@ -1,8 +1,8 @@
 {
-    "name": "Front Door Module",
+    "name": "Simple Azure Front Door Module",
     "description": "This module deploys an Azure Front Door with the specified backend address and configuration.",
     "author": "Latzox",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "tags": ["front door", "bicep", "azure", "network"],
-    "datePublished": "2024-06-30"
+    "datePublished": "2024-07-01"
 }

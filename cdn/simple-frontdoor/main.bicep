@@ -1,7 +1,10 @@
+@description('The name of the resource.')
 param resName string
+
+@description('The address of the backend.')
 param backendAddress string
 
-var frontDoorName = 'afd-${resName}'
+var frontDoorName = 'azfd-${resName}'
 var frontEndEndpointName = 'EndP-${resName}'
 var loadBalancingSettingsName = 'Load-${resName}'
 var healthProbeSettingsName = 'Health-${resName}'
@@ -22,7 +25,6 @@ resource frontdoor 'Microsoft.Network/frontDoors@2021-06-01' = {
         }
       }
     ]
-
     loadBalancingSettings: [
       {
         name: loadBalancingSettingsName
@@ -32,7 +34,6 @@ resource frontdoor 'Microsoft.Network/frontDoors@2021-06-01' = {
         }
       }
     ]
-
     healthProbeSettings: [
       {
         name: healthProbeSettingsName
@@ -43,7 +44,6 @@ resource frontdoor 'Microsoft.Network/frontDoors@2021-06-01' = {
         }
       }
     ]
-
     backendPools: [
       {
         name: backendPoolName
@@ -60,7 +60,11 @@ resource frontdoor 'Microsoft.Network/frontDoors@2021-06-01' = {
             }
           ]
           loadBalancingSettings: {
-            id: resourceId('Microsoft.Network/frontDoors/loadBalancingSettings', frontDoorName, loadBalancingSettingsName)
+            id: resourceId(
+              'Microsoft.Network/frontDoors/loadBalancingSettings',
+              frontDoorName,
+              loadBalancingSettingsName
+            )
           }
           healthProbeSettings: {
             id: resourceId('Microsoft.Network/frontDoors/healthProbeSettings', frontDoorName, healthProbeSettingsName)
@@ -68,7 +72,6 @@ resource frontdoor 'Microsoft.Network/frontDoors@2021-06-01' = {
         }
       }
     ]
-
     routingRules: [
       {
         name: routingRuleName
@@ -89,7 +92,7 @@ resource frontdoor 'Microsoft.Network/frontDoors@2021-06-01' = {
             '@odata.type': '#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration'
             forwardingProtocol: 'HttpsOnly'
             backendPool: {
-              id: resourceId('Microsoft.Network/frontDoors/backEndPools', frontDoorName, backendPoolName)
+              id: resourceId('Microsoft.Network/frontDoors/backendPools', frontDoorName, backendPoolName)
             }
           }
           enabledState: 'Enabled'
@@ -98,3 +101,7 @@ resource frontdoor 'Microsoft.Network/frontDoors@2021-06-01' = {
     ]
   }
 }
+
+output frontDoorId string = frontdoor.id
+output frontEndEndpoint string = frontdoor.properties.frontendEndpoints[0].properties.hostName
+output backendPoolId string = frontdoor.properties.backendPools[0].id
