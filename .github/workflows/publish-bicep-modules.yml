@@ -87,8 +87,12 @@ jobs:
             short_sha="${{ steps.vars.outputs.short_sha }}"
             registry="br:latzo.azurecr.io/bicep/modules/$module_path"
 
-            # Publish new latest
+            # Publish new version
             echo "Publishing $dir/main.bicep to $registry:$short_sha"
             az bicep publish --file $dir/main.bicep --target $registry:$short_sha
+
+            # Overwrite latest
+            echo "Publishing $dir/main.bicep to $registry:latest"
+            az bicep publish --file $dir/main.bicep --target $registry:latest
           fi
         done
