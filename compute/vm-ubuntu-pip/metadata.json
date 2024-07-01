@@ -1,0 +1,8 @@
+{
+    "name": "Azure VM Ubuntu with PIP",
+    "description": "This module deploys an Azure VM with a public ip address.",
+    "author": "Latzox",
+    "version": "1.0.0",
+    "tags": ["vm", "bicep", "azure", "network"],
+    "datePublished": "2024-07-01"
+}
