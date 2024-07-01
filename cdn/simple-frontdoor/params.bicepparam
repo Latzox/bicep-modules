@@ -1,5 +1,5 @@
 using './main.bicep'
 
-param resName = 'latzotestfrontdoor11243234'
-param backendAddress = 'latzo.ch'
+param resName = 'simplefrontdoor10483628'
+param backendAddress = 'mybackend.example.com'
 
