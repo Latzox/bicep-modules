@@ -1,10 +1,10 @@
 @description('The name of your app.')
 param appName string
 
-@description('The number of the resource being deployed - ### z.b. 001')
+@description('The number of the resource being deployed - ### e.g., 001')
 param instanceNumber int
 
-@description('The environement for the app such as prod, dev or preview.')
+@description('The environment for the app such as prod, dev, or preview.')
 @allowed([
   'prod'
   'dev'
@@ -40,7 +40,7 @@ param ubuntuOSVersion string
 @description('Location for all resources.')
 param location string = resourceGroup().location
 
-@description('The size of the VM')
+@description('The size of the VM.')
 @allowed([
   'Standard_B1s'
   'Standard_B2s'
@@ -51,7 +51,7 @@ param location string = resourceGroup().location
 ])
 param vmSize string
 
-@description('The id of the subnet.')
+@description('The ID of the subnet.')
 param subnetId string
 
 @description('Security Type of the Virtual Machine.')
@@ -60,6 +60,40 @@ param subnetId string
   'TrustedLaunch'
 ])
 param securityType string = 'TrustedLaunch'
+
+@description('Encoded Cloud Init data.')
+param encodedCloudInit string
+
+@description('Name of the Network Security Group.')
+param networkSecurityGroupName string = 'nsg-${appName}-${environment}-${instanceNumber}'
+
+@description('The name of the public IP address resource.')
+param publicIPAddressName string = 'pip-${appName}-${environment}-${instanceNumber}'
+
+@description('The name of the network interface for the VM.')
+param networkInterfaceName string = 'nic-${appName}-${environment}-${instanceNumber}'
+
+var osDiskType = 'Standard_LRS'
+
+var linuxConfiguration = {
+  disablePasswordAuthentication: authenticationType != 'password'
+  ssh: (authenticationType == 'sshPublicKey') ? {
+    publicKeys: [
+      {
+        path: '/home/${adminUsername}/.ssh/authorized_keys'
+        keyData: adminPasswordOrKey
+      }
+    ]
+  } : null
+}
+
+var securityProfileJson = {
+  uefiSettings: {
+    secureBootEnabled: true
+    vTpmEnabled: true
+  }
+  securityType: securityType
+}
 
 var imageReference = {
   'Ubuntu-1804': {
@@ -80,37 +114,6 @@ var imageReference = {
     sku: '22_04-lts-gen2'
     version: 'latest'
   }
-}
-
-param encodedCloudInit string
-
-@description('Name of the Network Security Group - nsg-appName-environment-uniqueString')
-param networkSecurityGroupName string = 'nsg-${appName}-${environment}-${instanceNumber}'
-
-@description('The name of the public ip address resource - pip-appName-switzerlandnorth-uniqueString')
-param publicIPAddressName string = 'pip-${appName}-${environment}-${instanceNumber}'
-
-@description('The name of the network interface for the vm --> nic-appName-environment-uniqueString')
-param networkInterfaceName string = 'nic-${appName}-${environment}-${instanceNumber}'
-
-var osDiskType = 'Standard_LRS'
-var linuxConfiguration = {
-  disablePasswordAuthentication: true
-  ssh: {
-    publicKeys: [
-      {
-        path: '/home/${adminUsername}/.ssh/authorized_keys'
-        keyData: adminPasswordOrKey
-      }
-    ]
-  }
-}
-var securityProfileJson = {
-  uefiSettings: {
-    secureBootEnabled: true
-    vTpmEnabled: true
-  }
-  securityType: securityType
 }
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
@@ -214,11 +217,11 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     osProfile: {
       computerName: 'vm-${appName}-${environment}-${instanceNumber}'
       adminUsername: adminUsername
-      adminPassword: adminPasswordOrKey
-      linuxConfiguration: ((authenticationType == 'password') ? null : linuxConfiguration)
+      adminPassword: (authenticationType == 'password') ? adminPasswordOrKey : null
+      linuxConfiguration: linuxConfiguration
       customData: encodedCloudInit
     }
-    securityProfile: ((securityType == 'TrustedLaunch') ? securityProfileJson : null)
+    securityProfile: (securityType == 'TrustedLaunch') ? securityProfileJson : null
   }
 }
 
