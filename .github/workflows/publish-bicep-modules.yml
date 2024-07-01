@@ -4,9 +4,12 @@ run-name: >
   ${{ github.workflow }}: ${{ github.event_name }} for ${{ github.ref_name }} by @${{ github.actor }}
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      module_name:
+        description: 'The module name to publish'
+        required: true
+        type: string
 
 jobs:
   Build:
@@ -33,22 +36,25 @@ jobs:
         az bicep install
         az bicep version
 
-    - name: Validate and Test Bicep modules
+    - name: Validate and Test Bicep module
       run: |
-        for dir in $(find . -type d); do
-          if [ -f "$dir/main.bicep" ]; then
-            param_file="$dir/params.bicepparam"
-            echo "Validating $dir/main.bicep"
-            az bicep build --file $dir/main.bicep
-            if [ -f "$param_file" ]; then
-             echo "Testing $dir/main.bicep with parameters $param_file"
-              az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $dir/main.bicep --parameters $param_file
-            else
-              echo "Testing $dir/main.bicep without parameters"
-              az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $dir/main.bicep
-            fi
+        module_name="${{ github.event.inputs.module_name }}"
+        module_dir=$(find . -type d -name "$module_name" -print -quit)
+        if [ -f "$module_dir/main.bicep" ]; then
+          param_file="$module_dir/params.bicepparam"
+          echo "Validating $module_dir/main.bicep"
+          az bicep build --file $module_dir/main.bicep
+          if [ -f "$param_file" ]; then
+            echo "Testing $module_dir/main.bicep with parameters $param_file"
+            az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $module_dir/main.bicep --parameters $param_file
+          else
+            echo "Testing $module_dir/main.bicep without parameters"
+            az deployment group validate --resource-group rg-bicepbuild-dev-001 --template-file $module_dir/main.bicep
           fi
-        done
+        else
+          echo "Module $module_dir/main.bicep does not exist"
+          exit 1
+        fi
 
   Publish:
     runs-on: ubuntu-latest
@@ -75,24 +81,34 @@ jobs:
         az bicep install
         az bicep version
       
-    - name: Get short commit hash
-      id: vars
-      run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+    - name: Extract version from metadata
+      id: version
+      run: |
+        module_name="${{ github.event.inputs.module_name }}"
+        module_dir=$(find . -type d -name "$module_name" -print -quit)
+        if [ -f "$module_dir/metadata.json" ]; then
+          version=$(jq -r '.version' "$module_dir/metadata.json")
+          echo "::set-output name=version::$version"
+        else
+          echo "metadata.json not found in $module_dir"
+          exit 1
+        fi
 
     - name: Publish Bicep modules
       run: |
-        for dir in $(find . -type d); do
-          if [ -f "$dir/main.bicep" ]; then
-            module_path=$(echo $dir | sed 's|^\./||')
-            short_sha="${{ steps.vars.outputs.short_sha }}"
-            registry="br:latzo.azurecr.io/bicep/modules/$module_path"
+        module_name="${{ github.event.inputs.module_name }}"
+        module_dir=$(find . -type d -name "$module_name" -print -quit)
+        parent_dir=$(dirname "$module_dir")
+        parent_dir=$(basename "$parent_dir")
+        version="${{ steps.version.outputs.version }}"
+        if [ -f "$module_dir/main.bicep" ]; then
+          registry="br:latzo.azurecr.io/bicep/modules/$parent_dir/$module_name"
 
-            # Publish new version
-            echo "Publishing $dir/main.bicep to $registry:$short_sha"
-            az bicep publish --file $dir/main.bicep --target $registry:$short_sha
-
-            # Overwrite latest
-            echo "Publishing $dir/main.bicep to $registry:latest"
-            az bicep publish --file $dir/main.bicep --target $registry:latest
-          fi
-        done
+          # Publish version
+          echo "Publishing $module_dir/main.bicep to $registry:$version"
+          az bicep publish --file $module_dir/main.bicep --target $registry:$version
+          
+        else
+          echo "Module $module_dir/main.bicep does not exist"
+          exit 1
+        fi
