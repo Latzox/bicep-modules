@@ -2,7 +2,7 @@
 
 # Public Bicep Modules
 
-Welcome to the repository of my Bicep modules! This repository contains a collection of reusable Bicep modules to streamline the deployment and management of Azure resources using Infrastructure as Code (IaC). All modules are publicly available in both this repository and an Azure Container Registry (ACR).
+This repository contains a collection of reusable Bicep modules to streamline the deployment and management of Azure resources using Infrastructure as Code (IaC). All modules are publicly available in both this repository and an Azure Container Registry (ACR).
 
 ## Using the Modules
 
@@ -13,7 +13,7 @@ To use these Bicep modules, you can reference them directly from the repository 
 All modules are also published to an Azure Container Registry for easier integration. To reference a module from the ACR, use the following syntax:
 
 ```
-module myModule 'br:latzo.azurecr.io/bicep/modules/cdn/simple-frontdoor:<tag>' = {
+module myModule 'br:latzo.azurecr.io/bicep/modules/cdn/simple-frontdoor:<version from metadata.json>' = {
   name: 'myModule'
   params: {
     // module parameters
@@ -26,6 +26,7 @@ module myModule 'br:latzo.azurecr.io/bicep/modules/cdn/simple-frontdoor:<tag>' =
 Contributions are welcome! If you have a module you would like to add, please fork the repository, create a new branch, and submit a pull request. Ensure your module includes the following:
 
 - A main.bicep file with the Bicep code.
+- A params.bicepparam file with example parameters for module.
 - A metadata.json file with details about the module.
 - A README.md file with documentation for the module.
 
