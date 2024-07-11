@@ -2,7 +2,7 @@
 
 # Public Bicep Modules
 
-Welcome to the repository of my Bicep modules! This repository contains a collection of reusable Bicep modules to streamline the deployment and management of Azure resources using Infrastructure as Code (IaC). All modules are publicly available in both this repository and an Azure Container Registry (ACR).
+This repository contains a collection of reusable Bicep modules to streamline the deployment and management of Azure resources using Infrastructure as Code (IaC). All modules are publicly available in both this repository and an Azure Container Registry (ACR).
 
 ## Using the Modules
 
