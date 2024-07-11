@@ -1,0 +1,8 @@
+{
+    "name": "Azure Cosmos DB with Table API",
+    "description": "This module deploys an Azure Cosmos DB account with Table API enabled and creates a table.",
+    "author": "Your Name",
+    "version": "1.0.0",
+    "tags": ["cosmosdb", "table", "azure", "database"],
+    "datePublished": "2024-07-11"
+}
