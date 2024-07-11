@@ -3,6 +3,6 @@
     "description": "This module deploys an Azure Front Door with the specified backend address and configuration.",
     "author": "Latzox",
     "version": "1.0.1",
-    "tags": ["front door", "bicep", "azure", "network"],
+    "tags": ["front door", "cdn", "azure", "network"],
     "datePublished": "2024-07-01"
 }

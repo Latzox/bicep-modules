@@ -1,0 +1,8 @@
+{
+    "name": "CosmosDB with Tables API",
+    "description": "This module deploys a CosmosDB with a serverless Table.",
+    "author": "Latzox",
+    "version": "1.0.0",
+    "tags": ["database", "cosmosdb", "azure", "data"],
+    "datePublished": "2024-07-11"
+}
