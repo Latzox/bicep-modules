@@ -4,6 +4,13 @@ param storageAccountName string
 @description('Specifies the name of the blob container.')
 param containerName string
 
+@description('Specifies the kind of storage account.')
+@allowed([
+  'StorageV2'
+  'BlobStorage'
+  'FileStorage'
+  'BlockBlobStorage'
+])
 param storageKind string
 
 @description('The access tier of the storage account.')

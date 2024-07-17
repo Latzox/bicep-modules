@@ -1,0 +1,8 @@
+{
+    "name": "Azure Storage Account with Blob Container",
+    "description": "This module deploys an Azure Storage account with a specified blob container.",
+    "author": "Latzox",
+    "version": "1.0.0",
+    "tags": ["Azure", "Storage", "Blob", "Container", "Bicep"],
+    "datePublished": "2023-07-17"
+}
