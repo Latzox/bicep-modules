@@ -50,3 +50,8 @@ jobs:
             fi
           fi
         done
+
+#     - name: Test Azure Well-Architected Framework (PSRule)
+#       uses: Microsoft/ps-rule@v2.9.0
+#       with:
+#         modules: PSRule.Rules.Azure
